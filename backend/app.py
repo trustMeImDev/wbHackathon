@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 # Your GitHub App details
 GITHUB_CLIENT_ID = "Iv23lif3gDv1sSQ71VVm"
-GITHUB_CLIENT_SECRET = "your_github_client_secret"  # You get this when registering your GitHub App
+GITHUB_CLIENT_SECRET = "d4ec8e71edcac7b3f2b99ac70d26373874b7ba8f"  # You get this when registering your GitHub App
 GITHUB_API_URL = "https://api.github.com"
 GITHUB_CALLBACK_URL = "http://127.0.0.1:5000/callback"  # Your callback URL
 
@@ -23,7 +23,7 @@ def login():
         "scope": "repo",  # Request repository access
         "state": "random_state_string",  # Use a random state to prevent CSRF attacks
     }
-    github_oauth_url = f"https://github.com/login/oauth/authorize?{urlencode(params, quote_via=quote_plus)}"
+    github_oauth_url = f"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&redirect_uri={GITHUB_CALLBACK_URL}"
     return redirect(github_oauth_url)
 
 # Step 2: Handle the redirect after GitHub authorization
@@ -38,15 +38,16 @@ def callback():
         "client_id": GITHUB_CLIENT_ID,
         "client_secret": GITHUB_CLIENT_SECRET,
         "code": code,
-        "redirect_uri": GITHUB_CALLBACK_URL,
     }
 
     response = requests.post('https://github.com/login/oauth/access_token', data=payload, headers={'Accept': 'application/json'})
     response_data = response.json()
+    access_token = response_data.get('access_token')
 
-    if response.status_code == 200 and "access_token" in response_data:
-        session['access_token'] = response_data['access_token']
-        return jsonify({"message": "Authorization successful. Access token obtained."}), 200
+    if access_token:
+        # session['access_token'] = response_data['access_token']
+        print(access_token)
+        return redirect("http://localhost:5173/?success=true")
     else:
         return jsonify({"error": "Failed to obtain access token."}), 400
 
