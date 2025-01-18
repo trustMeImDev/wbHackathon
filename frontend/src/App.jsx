@@ -1,15 +1,15 @@
 import './App.css'
-import { Button } from './components/ui/button'
-import { ThemeProvider } from './lib/theme-provider'
+import { Route, Routes } from 'react-router'
+import { Login } from './pages/Login'
 
 function App() {
 
   return (
-    <ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
-      <div className='text-4xl'>
-        <Button>Click Me!</Button>
-      </div>
-    </ThemeProvider>
+
+    <Routes>
+      <Route path='/login' element={<Login/>} />
+      <Route path='/' element={<> </>} />
+    </Routes>
   )
 
 }
