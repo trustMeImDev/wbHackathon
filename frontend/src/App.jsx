@@ -1,11 +1,15 @@
 import './App.css'
+import { Button } from './components/ui/button'
+import { ThemeProvider } from './lib/theme-provider'
 
 function App() {
 
-  return(
-    <div className='text-4xl'>
-      <h1>React App</h1>
-    </div>
+  return (
+    <ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
+      <div className='text-4xl'>
+        <Button>Click Me!</Button>
+      </div>
+    </ThemeProvider>
   )
 
 }
