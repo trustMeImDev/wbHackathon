@@ -12,14 +12,16 @@ function Graph({ data, onNodeClick }) {
         const currentId = `${parentId ? `${parentId}-` : ""}${data.name}`;
         const position = { x, y: depth * 150 };
 
+        // Creating the node with the appropriate label and type
         nodes.push({
             id: currentId,
-            data: { label: `${data.name} (${data.type})` },
+            data: { label: `${data.name} (${data.type})`, ...data },
             position,
             type: "default",
         });
 
-        if (data.type === "directory" && data.children) {
+        // If the node has children, create edges and sub-nodes for them
+        if (data.children && data.children.length > 0) {
             const totalChildren = data.children.length;
             const halfWidth = (totalChildren - 1) * baseSpacing * 0.5;
 
@@ -63,7 +65,7 @@ function Graph({ data, onNodeClick }) {
                 edges={edges}
                 colorMode="dark"
                 onNodeClick={(event, node) => {
-                    onNodeClick && onNodeClick(node);
+                    onNodeClick && onNodeClick(node.data); // Pass node data to the handler
                 }}
             >
                 <Background />
