@@ -12,16 +12,14 @@ import { HiOutlineChartPie } from "react-icons/hi";
 export const Home = () => {
     return (
         <>
-            <div className="flex flex-col items-center justify-center min-h-screen text-white p-4">
-                <div className="text-center">
-                    <div className="text-5xl font-extrabold mb-10 font-mono">
-                        <h1>Overwhelmed by</h1>
+            <div className="flex flex-col items-center justify-center min-h-screen text-white text-center">
+                    <div className="text-5xl font-extrabold mb-4 font-mono">
+                        <h1 className='mt-20'>Overwhelmed by</h1>
                         <h1>large codebases?</h1>
                     </div>
-                    <p className="text-lg text-gray-300 font-mono">
+                    <p className="text-lg text-gray-300 font-mono mb-2">
                         Generate visualizations and file summaries instantly with ease
                     </p>
-                </div>
                 <div className="w-full max-w-4xl">
                     <div className="flex w-full mt-8 max-w-4xl items-center space-x-2">
                         <Input type="repo-url" placeholder="Paste your Github Repo URL" />
@@ -77,7 +75,7 @@ export const Home = () => {
                 <div className="mt-16 w-full max-w-6xl text-center">
                     <h2 className="text-md font-mono">OUR SOLUTIONS</h2>
                     <h3 className="text-3xl font-semibold mb-8">
-                        How we simplify codebase understanding
+                        How we simplify codebase navigation
                     </h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -88,7 +86,7 @@ export const Home = () => {
                             </CardHeader>
                             <CardContent>
                                 <p className="text-gray-400">
-                                    Visualize code structure and file dependencies through an interactive flowchart.
+                                    Visualize code structure and file dependencies through an interactive flowchart to grasp connections effortlessly.
                                 </p>
                             </CardContent>
                         </Card>
@@ -100,11 +98,10 @@ export const Home = () => {
                             </CardHeader>
                             <CardContent>
                                 <p className="text-gray-400">
-                                    Browse and analyze individual file contents directly from the flowchart.
+                                    Browse and analyze individual file contents directly from the visualization tool.
                                 </p>
                             </CardContent>
                         </Card>
-
 
                         <Card className="bg-gray-800 text-white">
                             <CardHeader>
@@ -117,6 +114,7 @@ export const Home = () => {
                                 </p>
                             </CardContent>
                         </Card>
+                        <p className='mb-8' />
                     </div>
                 </div>
             </div>
