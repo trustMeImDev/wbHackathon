@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router'
 import { Login } from './pages/Login'
 import Summary from './pages/Summary'
 import { Home } from './pages/Home';
+import FileSummary from './pages/FileSummary';
 import { Authenticated } from './pages/Authenticated';
 import ProtectedRoute from './components/protected-route';
 
@@ -17,6 +18,7 @@ function App() {
         </ProtectedRoute>
       } />
       <Route path='/authenticated' element={<Authenticated/>} />
+      <Route path='/file' element={<FileSummary/>} />
     </Routes>
   )
 
