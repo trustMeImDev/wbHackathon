@@ -1,16 +1,17 @@
 import os
 import jwt
-# import pyrebase
 import requests
 from firebase_admin import firestore, initialize_app, credentials
 from flask import Flask, request, redirect, jsonify, session, make_response
 from flask_cors import CORS
+from github.get_contents import get_repo_structure
+from auth_middleware import token_required
 
 app = Flask(__name__)
 
 # Your GitHub App details
-GITHUB_CLIENT_ID = "Iv23lif3gDv1sSQ71VVm"
-GITHUB_CLIENT_SECRET = "d4ec8e71edcac7b3f2b99ac70d26373874b7ba8f"  # You get this when registering your GitHub App
+GITHUB_CLIENT_ID = "Ov23li2x0JgEVKjiczQZ"
+GITHUB_CLIENT_SECRET = "a8b67b31950414b0ee279d733c245e120145713a"  # You get this when registering your GitHub App
 GITHUB_API_URL = "https://api.github.com"
 GITHUB_CALLBACK_URL = "http://127.0.0.1:5000/callback"  # Your callback URL
 
@@ -50,10 +51,17 @@ def login():
     params = {
         "client_id": GITHUB_CLIENT_ID,
         "redirect_uri": GITHUB_CALLBACK_URL,
-        "scope": "repo",
+        "scope": "repo",  # Request access to private repositories
         "state": "random_state_string",
     }
-    github_oauth_url = f"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&redirect_uri={GITHUB_CALLBACK_URL}"
+    # Construct the GitHub OAuth URL
+    github_oauth_url = (
+        f"https://github.com/login/oauth/authorize?"
+        f"client_id={params['client_id']}&"
+        f"redirect_uri={params['redirect_uri']}&"
+        f"scope={params['scope']}&"
+        f"state={params['state']}"
+    )
     return redirect(github_oauth_url)
 
 
@@ -108,43 +116,20 @@ def callback():
     else:
         return jsonify({"error": "Failed to obtain access token."}), 400
 
-@app.route('/get-repo-info', methods=['GET'])
-def get_repo_info():
-    if 'access_token' not in session:
-        return jsonify({"error": "Unauthorized. Please log in first."}), 403
+@app.route('/get-repo-info', methods=['POST'])
+@token_required
+def get_repo_info(currentUser):
+    repo_url = request.json.get("repo_url")
+    currentUserId = currentUser.get("id")
 
-    access_token = session['access_token']
-    repo_url = request.args.get('repo_url')
-    if not repo_url:
-        return jsonify({"error": "Please provide a GitHub repository URL."}), 400
+    user_ref = db.collection("users")
+    user = user_ref.document(str(currentUserId)).get()
 
-    try:
-        repo_path = repo_url.replace("https://github.com/", "").strip("/").split("/")
-        if len(repo_path) < 2:
-            return jsonify({"error": "Invalid GitHub repository URL."}), 400
-
-        owner, repo_name = repo_path[:2]
-        headers = {"Authorization": f"Bearer {access_token}"}
-
-        # Fetch file structure from GitHub
-        def fetch_files(directory=""):
-            url = f"{GITHUB_API_URL}/repos/{owner}/{repo_name}/contents/{directory}"
-            response = requests.get(url, headers=headers)
-            response.raise_for_status()
-            contents = response.json()
-            files = []
-            for item in contents:
-                if item["type"] == "dir":
-                    files.extend(fetch_files(item["path"]))  # Recursively fetch files from directories
-                else:
-                    files.append({"path": item["path"], "name": item["name"]})
-            return files
-
-        file_structure = fetch_files()
-        return jsonify(file_structure)
-
-    except requests.exceptions.RequestException as e:
-        return jsonify({"error": f"GitHub API request failed: {str(e)}"}), 500
+    if not user.exists:
+        return jsonify({"error": "User not found"}), 404
+    
+    user_data = user.to_dict()
+    return get_repo_structure(currentUser=user_data, repo_url=repo_url)
 
 if __name__ == "__main__":
     app.run(debug=True)
