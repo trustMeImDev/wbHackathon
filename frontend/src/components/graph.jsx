@@ -11,35 +11,64 @@ function Graph({ data }) {
     const [edges, setEdges] = useState([]);
     let nodeCounter = 0;
 
-    const createGraph = (data, parentId = null, x = 0, y = 0, depth = 1) => {
-        const nodes = [];
-        const edges = [];
-        const currentId = `${parentId ? `${parentId}-` : ""}${data.name}`;
-        const position = { x: x * 200, y: depth * 100 };
-      
-        // Add the current node
-        nodes.push({
-          id: currentId,
-          data: { label: `${data.name} (${data.type})` },
-          position,
-          type: "default",
-        });
-      
-        // Add edges and traverse children if it's a directory
-        if (data.type === "directory" && data.children) {
-          data.children.forEach((child, index) => {
-            const childId = `${currentId}-${child.name}`;
-            edges.push({ id: `e-${childId}`, source: currentId, target: childId });
-            const { nodes: childNodes, edges: childEdges } = createGraph(child, currentId, index, y + 1, depth + 1);
-            nodes.push(...childNodes);
-            edges.push(...childEdges);
+    const generateTree = (data, parentId = null, x = 0, y = 0, depth = 1, baseSpacing = 150) => {
+      const nodes = [];
+      const edges = [];
+    
+      // Generate a unique ID for the current node
+      const currentId = `${parentId ? `${parentId}-` : ""}${data.name}`;
+      const position = { x, y: depth * 150 }; // Vertical spacing based on depth
+    
+      // Add the current node
+      nodes.push({
+        id: currentId,
+        data: { label: `${data.name} (${data.type})` },
+        position,
+        type: "default",
+      });
+    
+      // Process children if it's a directory
+      if (data.type === "directory" && data.children) {
+        const totalChildren = data.children.length;
+        const depthFactor = baseSpacing * depth; // Increase spacing by depth
+    
+        // Calculate the total width occupied by siblings
+        const halfWidth = (totalChildren - 1) * depthFactor * 0.5;
+    
+        data.children.forEach((child, index) => {
+          // Calculate the horizontal position of the child node
+          const childX = x - halfWidth + index * depthFactor * 1.1; // Spread siblings using depthFactor
+          const childId = `${currentId}-${child.name}`;
+    
+          // Add an edge from the current node to the child
+          edges.push({
+            id: `e-${currentId}-${childId}`,
+            source: currentId,
+            target: childId,
           });
-        }
-        return { nodes, edges };
-      };
+    
+          // Recursively generate the tree for the child
+          const { nodes: childNodes, edges: childEdges } = generateTree(
+            child,
+            currentId,
+            childX,
+            y + 1,
+            depth + 1,
+            baseSpacing
+          );
+    
+          nodes.push(...childNodes);
+          edges.push(...childEdges);
+        });
+      }
+    
+      return { nodes, edges };
+    };
+    
+    
 
     useEffect(() => {
-        const { nodes, edges } = createGraph(data);
+        const { nodes, edges } = generateTree(data);
         console.log(nodes);
         console.log(edges)
         setNodes(nodes);

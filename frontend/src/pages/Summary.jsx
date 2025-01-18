@@ -16,6 +16,30 @@ function Summary() {
                     {
                         "name": "package.json",
                         "type": "file"
+                    },
+                    {
+                        "name": "src",
+                        "type": "directory",
+                        "children": [
+                            {
+                                "name": "App.js",
+                                "type": "file"
+                            },
+                            {
+                                "name": "components",
+                                "type": "directory",
+                                "children": [
+                                    {
+                                        "name": "graph.jsx",
+                                        "type": "file"
+                                    },
+                                    {
+                                        "name": "info-section.jsx",
+                                        "type": "file"
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ]
             },
