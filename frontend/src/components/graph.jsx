@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { ReactFlow, Controls, Background } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useEffect, useState } from 'react';
@@ -6,57 +7,39 @@ function Graph({ data, onNodeClick }) {
     const [nodes, setNodes] = useState([]);
     const [edges, setEdges] = useState([]);
 
-    const generateTree = (data, parentId = null, x = 0, y = 0, depth = 1, baseSpacing = 150) => {
+    const createGraph = (data, parentId = null, x = 0, y = 0, depth = 1) => {
+        console.log(data)
         const nodes = [];
         const edges = [];
         const currentId = `${parentId ? `${parentId}-` : ""}${data.name}`;
-        const position = { x, y: depth * 150 };
+        const position = { x: x * 200, y: depth * 100 };
 
-        // Creating the node with the appropriate label and type
+        // Add the current node
         nodes.push({
             id: currentId,
-            data: { label: `${data.name} (${data.type})`, ...data },
+            data: { label: `${data.name} (${data.type})` },
             position,
             type: "default",
         });
 
-        // If the node has children, create edges and sub-nodes for them
-        if (data.children && data.children.length > 0) {
-            const totalChildren = data.children.length;
-            const halfWidth = (totalChildren - 1) * baseSpacing * 0.5;
-
+        // Add edges and traverse children if it's a directory
+        if (data.type === "directory" && data.children) {
             data.children.forEach((child, index) => {
-                const childX = x - halfWidth + index * baseSpacing;
                 const childId = `${currentId}-${child.name}`;
-
-                edges.push({
-                    id: `e-${currentId}-${childId}`,
-                    source: currentId,
-                    target: childId,
-                });
-
-                const { nodes: childNodes, edges: childEdges } = generateTree(
-                    child,
-                    currentId,
-                    childX,
-                    y + 1,
-                    depth + 1,
-                    baseSpacing
-                );
-
+                edges.push({ id: `e-${childId}`, source: currentId, target: childId });
+                const { nodes: childNodes, edges: childEdges } = createGraph(child, currentId, index, y + 1, depth + 1);
                 nodes.push(...childNodes);
                 edges.push(...childEdges);
             });
         }
-
         return { nodes, edges };
     };
 
     useEffect(() => {
-        const { nodes, edges } = generateTree(data);
+        const { nodes, edges } = createGraph(data);
         setNodes(nodes);
         setEdges(edges);
-    }, [data]);
+    }, []);
 
     return (
         <div className="w-[70%] h-full">

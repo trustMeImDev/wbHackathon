@@ -9,7 +9,7 @@ WORQHAT_API_KEY = os.getenv("worqhat_api_key")
 
 WORQHAT_API_URL = os.getenv("worqhat_api_url")
 
-def code_summary(code_snippet, model="aicon-v4-nano-160824", randomness=0.5, stream_data=False):
+def get_code_summary(code_snippet, model="aicon-v4-nano-160824", randomness=0.5, stream_data=False):
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {WORQHAT_API_KEY}"
@@ -59,58 +59,58 @@ def process_response_data(response_data):
         print(f"Error processing the response data: {error}")
         return None
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    sample_code = """
-p = 3
-q = 5
-print(f"p = {p} q = {q}")
-n = p * q
-print(f"n = {n}")
+#     sample_code = """
+# p = 3
+# q = 5
+# print(f"p = {p} q = {q}")
+# n = p * q
+# print(f"n = {n}")
 
-toitent = (p-1)*(q-1)
-print("phi of n :", toitent)
+# toitent = (p-1)*(q-1)
+# print("phi of n :", toitent)
 
-#euclidean theorem
-#m is quotient r is remainder
-#n is divisor
-def gcd(m, n):
-    while(n != 0):
-        m,n = n, m % n
-    return m 
+# #euclidean theorem
+# #m is quotient r is remainder
+# #n is divisor
+# def gcd(m, n):
+#     while(n != 0):
+#         m,n = n, m % n
+#     return m 
 
-e = 2
-while (e < toitent): #satisfying first condition that e must be smaller than toitent function value and > 1 ( since e is starting with 2 )
+# e = 2
+# while (e < toitent): #satisfying first condition that e must be smaller than toitent function value and > 1 ( since e is starting with 2 )
  
-    if(gcd(e, toitent) == 1):
-        break
-    else:
-        e = e+1
-print(f"e is {e}")
+#     if(gcd(e, toitent) == 1):
+#         break
+#     else:
+#         e = e+1
+# print(f"e is {e}")
 
-k = 1
-d = int((1+(k*toitent))/e)
-print(f"d is {d}")
+# k = 1
+# d = int((1+(k*toitent))/e)
+# print(f"d is {d}")
 
-#encryption
-M = int(input("enter Plaintext that is less than N: ")) #PT ( M ) should be less than n
-if M > n:
-    print("please enter a value less than n")
-else:
-    print(f"Plain text is {M}")
-    C = pow(M, e, n) #python mod function can be used in this way with three parameters 
-    print(f"Cipher text is {C}")
+# #encryption
+# M = int(input("enter Plaintext that is less than N: ")) #PT ( M ) should be less than n
+# if M > n:
+#     print("please enter a value less than n")
+# else:
+#     print(f"Plain text is {M}")
+#     C = pow(M, e, n) #python mod function can be used in this way with three parameters 
+#     print(f"Cipher text is {C}")
 
-    #decription
-    PT = pow(C, d, n)
-    print(f"Plain text after decryption is {PT}")
-"""
+#     #decription
+#     PT = pow(C, d, n)
+#     print(f"Plain text after decryption is {PT}")
+# """
 
 
 
-    summary = code_summary(sample_code)
-    if summary:
-        print(json.dumps(summary, indent=4))
-    else:
-        print("Failed to fetch analysis.")
+#     summary = code_summary(sample_code)
+#     if summary:
+#         print(json.dumps(summary, indent=4))
+#     else:
+#         print("Failed to fetch analysis.")
 
