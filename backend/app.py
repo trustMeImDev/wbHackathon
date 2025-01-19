@@ -171,7 +171,7 @@ def code_summary(currentUser):
 @app.route("/code-flow", methods=["POST"])
 @token_required
 def code_flow(currentUser):
-    # try:
+    try:
         file_path = request.json.get("file_path")
         repo_url = request.json.get("repo_url")
         function_name = request.json.get("function_name")
@@ -190,8 +190,8 @@ def code_flow(currentUser):
 
         format = workflow(code_snippet, function_name)
         return jsonify(format)
-    # except Exception as e:
-    #     return jsonify({"error": str(e)}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/code-dependancy", methods=["POST"])

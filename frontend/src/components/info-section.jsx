@@ -8,29 +8,26 @@ import Cookies from "js-cookie";
 
 const InfoSection = ({ fileTextSummary, selectedNodeData, fileSummaryData, repo_url, pathUrl }) => {
 
-    useEffect(() => {
-        console.log(fileSummaryData, fileTextSummary, selectedNodeData);
-    }, [fileTextSummary, selectedNodeData, fileSummaryData]);
-
+    
     const [flowchartData, setFlowchartData] = useState(null);
     const [selectedFunction, setFunction] = useState(null);
-
+    
+    useEffect(() => {
+        console.log(fileSummaryData, fileTextSummary, selectedNodeData);
+    }, [fileTextSummary, selectedNodeData, fileSummaryData, flowchartData]);
     const handleClick = async (val) => {
         setFunction(val);
         const authToken = Cookies.get("authToken");
-        console.log(val)
         const functionData = await fetch("http://127.0.0.1:5000/code-flow", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${authToken}`,
             },
-            body: {
-                repo_url: repo_url,
-                file_path: pathUrl,
-                function_name: val,
-            }
+            body: JSON.stringify({ function_name: val, repo_url, file_path: pathUrl }),
         });
+        const functionDataJson = await functionData.json();
+        setFlowchartData(functionDataJson);
     }
 
     return (
