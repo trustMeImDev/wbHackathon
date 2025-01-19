@@ -2,41 +2,45 @@
 import { useEffect, useState } from "react";
 import { Card } from "./ui/card";
 import Graph from "@/components/graph"; 
+import Cookies from "js-cookie";
 
-export const fetchCodeSummary = async (token, file_path, repo_url) => {
-    try {
-        const response = await fetch("http://127.0.0.1:5000/code-summary", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ file_path, repo_url }),
-          });
 
-        if (!response.ok) {
-            throw new Error("Failed to fetch code summary");
+const InfoSection = ({ selectedNodeData, file_path, repo_url }) => {
+    const fetchCodeSummary = async (file_path, repo_url) => {
+        console.log(file_path);
+        console.log(repo_url)
+        const token = Cookies.get("authToken");
+        try {
+            const response = await fetch("http://127.0.0.1:5000/code-summary", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ file_path, repo_url }),
+              });
+    
+            if (!response.ok) {
+                throw new Error("Failed to fetch code summary");
+            }
+    
+            const summaryData = await response.json();
+            return summaryData;
+        } catch (error) {
+            console.error("Error fetching code summary:", error);
+            throw error; 
         }
-
-        const summaryData = await response.json();
-        return summaryData;
-    } catch (error) {
-        console.error("Error fetching code summary:", error);
-        throw error; 
-    }
-};
-
-const InfoSection = ({ selectedNodeData, token, file_path, repo_url }) => {
+    };
     const [fileTextSummary, setFileTextSummary] = useState(null);
-
+    
     // fetching summary
     useEffect(() => {
         if (selectedNodeData?.type === "file") {
-            fetchCodeSummary(token, file_path, repo_url)
+            fetchCodeSummary(Cookies.get("authToken"), file_path, repo_url)
                 .then((data) => setFileTextSummary(data))
                 .catch((error) => console.error("Error fetching file summary:", error));
         }
-    }, [selectedNodeData, file_path, repo_url, token]);
+    }, [selectedNodeData]);
 
     const fileSummaryData = {
         name: "even_odd",
