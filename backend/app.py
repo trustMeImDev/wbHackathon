@@ -2,12 +2,13 @@ import os
 import jwt
 import requests
 from firebase_admin import firestore, initialize_app, credentials
-from flask import Flask, request, redirect, jsonify, session, make_response
+from flask import Flask, request, redirect, jsonify
 from flask_cors import CORS
 from github.get_contents import get_repo_structure, get_file_contents
 from auth_middleware import token_required
 from worqhat_api.worqhat_summary import get_code_summary
 from worqhat_api.worqhat_dependency_eval import dependancy_eval
+from worqhat_api.worqhat_flow import workflow
 
 app = Flask(__name__)
 
@@ -173,6 +174,7 @@ def code_flow(currentUser):
     try:
         file_path = request.json.get("file_path")
         repo_url = request.json.get("repo_url")
+        function_name = request.json.get("function_name")
 
         user_ref = db.collection("users")
         user = user_ref.document(str(currentUser["id"])).get()
@@ -185,8 +187,8 @@ def code_flow(currentUser):
 
         code_snippet = get_file_contents(repo_url, file_path, access_token)
 
-        return jsonify({"message": "Code flow analysis not implemented yet."})
-    
+        format = workflow(code_snippet, function_name)
+        return jsonify(format)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

@@ -25,7 +25,7 @@ function Graph({ data, onNodeClick }) {
 
         if (data.children && data.children.length > 0) {
             const totalChildren = data.children.length;
-            const halfWidth = (totalChildren - 1) * baseSpacing * 0.5;
+            const halfWidth = (totalChildren - 1) * 0.5;
 
             data.children.forEach((child, index) => {
                 const childId = `${currentId}-${child.name}`;
