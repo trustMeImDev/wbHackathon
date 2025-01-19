@@ -1,4 +1,4 @@
-#WORK IN PROGRESS
+#updated
 
 import os
 from dotenv import load_dotenv 
@@ -23,33 +23,79 @@ def analyze_code(code_snippet, model="aicon-v4-nano-160824", randomness=0.5, str
         "randomness": randomness,
         "stream_data": stream_data,
         "response_type": "json",
-        "training_data": """You are tasked with analyzing the provided code and generating a structured representation in two parts:
+        "training_data": """
+You are tasked with analyzing the provided code and generating a structured representation optimized for visualization in React Flow. The output must strictly adhere to the following format and constraints:
 
-    Hierarchical JSON Structure: This structure should represent the code components and their relationships. The output should include:
-        name: The name of the function, method, or code component.
-        type: The type of the component (e.g., "file", "directory", "parameter", "resource").
-        children: A list of nested components or dependencies.
-        dependencies: A list of components or resources this component relies on.
-        For each function/method, include its parameters as "parameter" type.
+1. **Hierarchical JSON Structure**:
+   - **Attributes**:
+     - `name`: The name of the function, method, or directory (module/class).
+     - `type`: The type of the component. Valid types are:
+       - `directory`: Represents a module or class.
+       - `function`: Represents a function or method.
+     - `children`: A list of nested components. Only include child elements of valid types (`function` or `directory`).
+     - `id`: A unique identifier for each component, formatted as {{parentId}}-{{name}}.
+     - `position`: An object with `x` and `y` values for hierarchical placement based on depth and spacing.
 
-    React Flow Viz Representation: This should be used for visualizing the code in a React Flow diagram:
-        Nodes: Represent each function, class, or important block of code.
-            Include:
-                id: Unique identifier.
-                label: The function/method name or description.
-                type: Type of node (e.g., "function", "class", "resource").
-        Edges: Represent dependencies between functions, variables, or modules.
-            Include:
-                source: ID of the source node.
-                target: ID of the target node.
-                relationship: Type of relationship (e.g., "calls", "depends_on", "shares_data").
+2. **React Flow Representation**:
+   - **Nodes**:
+     - `id`: Matches the unique identifier from the hierarchical structure.
+     - `label`: Format as `{{name}} ({{type}})`.
+     - `type`: Either `directory` or `function`.
+     - `position`: Includes `x` and `y` values for layout.
+   - **Edges**:
+     - `id`: Format as `e-{{source}}-{{target}}`.
+     - `source`: The `id` of the parent node.
+     - `target`: The `id` of the child node.
 
-    Formula/Syntax for Structure:
+---
 
-    A function is represented as a node with "type": "function" and parameters listed under "children" with "type": "parameter".
-    A module or class is represented as a "directory", with functions or classes nested under "children".
-    Dependencies (e.g., data, resources, other functions) should be listed under "dependencies" and represented as edges in the React Flow format.
-    Include all relevant relationships, showing which components rely on others."""
+### Rules:
+1. **Valid Types Only**: Include only components with `type` attributes `function` or `directory`.
+2. **Nesting**: Functions (`type: function`) must be nested under their parent directory (`type: directory`) or another function if applicable.
+3. **Exclusions**: Exclude parameters, resources, and any other types not explicitly allowed.
+4. **Positioning**: Assign `position` attributes for hierarchical placement. Use consistent vertical spacing for depth and horizontal spacing for siblings.
+
+---
+
+### Example Output:
+
+**Hierarchical JSON Structure**:
+```json
+{{
+  "name": "MainModule",
+  "type": "directory",
+  "id": "root-MainModule",
+  "position": {{ "x": 0, "y": 0 }},
+  "children": [
+    {{
+      "name": "ClassA",
+      "type": "directory",
+      "id": "root-MainModule-ClassA",
+      "position": {{ "x": -200, "y": 150 }},
+      "children": [
+        {{
+          "name": "methodA",
+          "type": "function",
+          "id": "root-MainModule-ClassA-methodA",
+          "position": {{ "x": -250, "y": 300 }}
+        }},
+        {{
+          "name": "methodB",
+          "type": "function",
+          "id": "root-MainModule-ClassA-methodB",
+          "position": {{ "x": -150, "y": 300 }}
+        }}
+      ]
+    }},
+    {{
+      "name": "globalFunction",
+      "type": "function",
+      "id": "root-MainModule-globalFunction",
+      "position": {{ "x": 200, "y": 150 }}
+    }}
+  ]
+}}
+"""
     }
 
     try:
