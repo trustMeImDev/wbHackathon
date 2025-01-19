@@ -1,6 +1,3 @@
-import { Button } from '../components/ui/button';
-import React from 'react';
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { IoMdTime } from "react-icons/io";
 import { BiDetail } from "react-icons/bi";

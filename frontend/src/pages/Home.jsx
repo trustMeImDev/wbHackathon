@@ -1,37 +1,20 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useAuth } from '@/contexts/auth-context';
 import { useEffect, useState } from 'react';
 
 export const Home = () => {
 
-    const [user, setUser] = useState(null);
+    // const [user, setUser] = useState(null);
     const [url, setUrl] = useState("");
-
-    const getUserData = async (token) => {
-        const response = await fetch('http://127.0.0.1:5000/verify-token', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ token }),
-        });
-        const data = await response.json();
-        return data;
-    };
+    const { isLoggedIn, user } = useAuth();
 
     const handleSubmitUrl = async() => {
         
     };
 
     useEffect(() => {
-        const authToken = document.cookie?.split('; ')?.find(row => row?.startsWith('authToken='));
-        if (authToken) {
-            const tokenValue = authToken.split('=')[1];
-            getUserData(tokenValue).then(data => {
-                console.log(data);
-                setUser(data);
-            });
-        }
+
     }, []);
 
     return (
