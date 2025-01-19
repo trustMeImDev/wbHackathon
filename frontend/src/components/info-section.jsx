@@ -1,23 +1,66 @@
 /* eslint-disable react/prop-types */
+import FunctionGraph from "./function-graph";
 import { Card } from "./ui/card";
-import Graph from "@/components/graph"; // Import Graph Component
 
 const InfoSection = ({ selectedNodeData }) => {
     // Sample data for a file-specific flowchart
     const fileSummaryData = {
-        name: "even_odd",
-        type: "function",
-        children: [
-            {
-                name: "while count < 5",
-                type: "while",
-                children: [
-                    { name: "if count % 2 == 0", type: "if", children: [] },
-                    { name: "else", type: "if", children: [] }
-                ]
-            }
+        "function_name": "reset_board",
+        "steps": [
+          {
+            "children": [
+              {
+                "branches": [
+                  {
+                    "action": "Remove the 'starting_pos' class from the current child node",
+                    "branch": "true",
+                    "state_change": "Class 'starting_pos' removed from the element"
+                  },
+                  {
+                    "action": "Skip the removal of 'starting_pos' class",
+                    "branch": "false",
+                    "state_change": "No state change"
+                  }
+                ],
+                "condition": "chessboard.childNodes[i].classList.contains('starting_pos')",
+                "description": "Check if the current child node has the 'starting_pos' class",
+                "type": "if_statement"
+              },
+              {
+                "branches": [
+                  {
+                    "action": "Remove the 'ending_pos' class from the current child node",
+                    "branch": "true",
+                    "state_change": "Class 'ending_pos' removed from the element"
+                  },
+                  {
+                    "action": "Skip the removal of 'ending_pos' class",
+                    "branch": "false",
+                    "state_change": "No state change"
+                  }
+                ],
+                "condition": "chessboard.childNodes[i].classList.contains('ending_pos')",
+                "description": "Check if the current child node has the 'ending_pos' class",
+                "type": "if_statement"
+              }
+            ],
+            "condition": "i < chessboard.childNodes.length",
+            "description": "Iterate through all child nodes of the chessboard",
+            "type": "loop"
+          },
+          {
+            "children": [
+              {
+                "description": "Remove the 'highlighted' class from the current move",
+                "type": "operation"
+              }
+            ],
+            "condition": "i < moves.length",
+            "description": "Iterate through all moves in the 'moves' array",
+            "type": "loop"
+          }
         ]
-    };
+      }
 
     return (
         <Card className="flex flex-col w-[30%] h-full p-4 bg-zinc-900 shadow-md border border-zinc-800 rounded-lg">
@@ -36,7 +79,7 @@ const InfoSection = ({ selectedNodeData }) => {
             {/* Render the FileSummary graph dynamically */}
             {selectedNodeData?.name === "even_odd.js" ? (
                 <div className="h-full border border-gray-700 rounded-lg flex items-center justify-center">
-                    <Graph
+                    <FunctionGraph
                         data={fileSummaryData}
                         onNodeClick={() => {}}
                         style={{

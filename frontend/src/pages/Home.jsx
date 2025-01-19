@@ -17,7 +17,7 @@ export const Home = () => {
             e.preventDefault();
             const repoName = url.split('/').slice(-2).join('/');
             if (localStorage.getItem(repoName)) {
-                navigate(`/summary?repo=${repoName}`);
+                navigate(`/directory?repo=${repoName}`);
                 return;
             }
             const token = Cookies.get("authToken");
@@ -33,7 +33,7 @@ export const Home = () => {
             const repoData = await response.json();
             localStorage.setItem(repoName, JSON.stringify(repoData));
             console.log(repoData);
-            navigate(`/summary?repo=${repoName}`);
+            navigate(`/directory?repo=${repoName}`);
         } catch (error) {
             console.log(error);
         }
