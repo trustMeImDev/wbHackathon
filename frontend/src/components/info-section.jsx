@@ -4,11 +4,10 @@ import { Card } from "./ui/card";
 import Graph from "@/components/graph"; 
 import Cookies from "js-cookie";
 
-
 const InfoSection = ({ selectedNodeData, file_path, repo_url }) => {
+    const [fileTextSummary, setFileTextSummary] = useState(null); // State to store fetched data
+
     const fetchCodeSummary = async (file_path, repo_url) => {
-        console.log(file_path);
-        console.log(repo_url)
         const token = Cookies.get("authToken");
         try {
             const response = await fetch("http://127.0.0.1:5000/code-summary", {
@@ -31,31 +30,14 @@ const InfoSection = ({ selectedNodeData, file_path, repo_url }) => {
             throw error; 
         }
     };
-    const [fileTextSummary, setFileTextSummary] = useState(null);
-    
-    // fetching summary
+
     useEffect(() => {
         if (selectedNodeData?.type === "file") {
-            fetchCodeSummary(Cookies.get("authToken"), file_path, repo_url)
+            fetchCodeSummary(file_path, repo_url)
                 .then((data) => setFileTextSummary(data))
                 .catch((error) => console.error("Error fetching file summary:", error));
         }
     }, [selectedNodeData]);
-
-    const fileSummaryData = {
-        name: "even_odd",
-        type: "function",
-        children: [
-            {
-                name: "while count < 5",
-                type: "while",
-                children: [
-                    { name: "if count % 2 == 0", type: "if", children: [] },
-                    { name: "else", type: "if", children: [] }
-                ]
-            }
-        ]
-    };
 
     return (
         <Card className="flex flex-col w-[30%] h-full p-4 bg-zinc-900 shadow-md border border-zinc-800 rounded-lg">
@@ -74,7 +56,7 @@ const InfoSection = ({ selectedNodeData, file_path, repo_url }) => {
                     {/* Summary Section */}
                     <div className="mt-4 mb-2 overflow-auto scrollbar-hide">
                         <Card className="p-4 bg-zinc-800 border border-zinc-700 rounded-lg mb-4">
-                            {fileTextSummary && selectedNodeData?.name === "even_odd.js" ? (
+                            {fileTextSummary ? (
                                 <>
                                     <h3 className="text-lg font-semibold text-white mb-4">Summary</h3>
                                     <p className="text-gray-300 text-sm">
@@ -93,7 +75,7 @@ const InfoSection = ({ selectedNodeData, file_path, repo_url }) => {
 
                         {/* Metrics Section */}
                         <Card className="p-4 bg-zinc-800 border border-zinc-700 rounded-lg mb-2">
-                            {fileTextSummary && selectedNodeData?.name === "even_odd.js" ? (
+                            {fileTextSummary ? (
                                 <>
                                     <h3 className="text-lg font-semibold text-white mb-4">Metrics</h3>
                                     <ul className="space-y-3 text-gray-300 text-sm">
@@ -120,10 +102,10 @@ const InfoSection = ({ selectedNodeData, file_path, repo_url }) => {
                     {/* Flowchart Section */}
                     <div className="flex flex-col mt-auto h-[50%]">
                         <Card className="flex-grow p-4 bg-zinc-800 border border-zinc-700 rounded-lg">
-                            {selectedNodeData?.type === "file" && selectedNodeData?.name === "even_odd.js" ? (
+                            {fileTextSummary?.flowchart ? (
                                 <div className="h-full border border-gray-700 rounded-lg flex items-center justify-center">
                                     <Graph
-                                        data={fileSummaryData}
+                                        data={fileTextSummary.flowchart} // Pass fetched flowchart data
                                         onNodeClick={() => {}}
                                         style={{
                                             height: "100%", // Ensure the graph fills the container
