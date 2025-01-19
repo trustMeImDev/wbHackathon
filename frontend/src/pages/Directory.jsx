@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import Graph from "@/components/graph";
 import InfoSection from "@/components/info-section"; 
 import { useLocation } from "react-router";
+import Cookie from "js-cookie";
+
 
 function Directory() {
 
@@ -10,8 +12,8 @@ function Directory() {
     const params = new URLSearchParams(search);
     const repo = params.get('repo');
     const [data, setData] = useState(null);
-    const [selectedNode, setSelectedNode] = useState(null);
-    
+    const [selectedNode, setSelectedNode] = useState("default");
+    const [fileSummaryData, setFileSummaryData] = useState(null);
     
     useEffect(() => {
         const fetchData = async () => {
@@ -32,14 +34,14 @@ function Directory() {
     }, []);
 
     // Handle node click
-    const handleNodeClick = (node) => {
+    const handleNodeClick = async(node) => {
         console.log(node.type)
         if(node.type === "file"){
             console.log(node)
-            const path = node.id.split('-').join('/');
-            console.log(path)
-            // setSelectedNode(node); // Update the selected node data
-
+            const pathArray = node.id.split('-').slice(1);
+            const path = pathArray.join('/');
+            const githubUrl = `https://github.com/${repo}`;
+            setSelectedNode(node); // Update the selected node data
         }
     };
 

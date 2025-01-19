@@ -1,67 +1,11 @@
 /* eslint-disable react/prop-types */
+import { useState } from "react";
 import FunctionGraph from "./function-graph";
 import { Card } from "./ui/card";
 
-const InfoSection = ({ selectedNodeData }) => {
-    // Sample data for a file-specific flowchart
-    const fileSummaryData = {
-        "function_name": "reset_board",
-        "steps": [
-          {
-            "children": [
-              {
-                "branches": [
-                  {
-                    "action": "Remove the 'starting_pos' class from the current child node",
-                    "branch": "true",
-                    "state_change": "Class 'starting_pos' removed from the element"
-                  },
-                  {
-                    "action": "Skip the removal of 'starting_pos' class",
-                    "branch": "false",
-                    "state_change": "No state change"
-                  }
-                ],
-                "condition": "chessboard.childNodes[i].classList.contains('starting_pos')",
-                "description": "Check if the current child node has the 'starting_pos' class",
-                "type": "if_statement"
-              },
-              {
-                "branches": [
-                  {
-                    "action": "Remove the 'ending_pos' class from the current child node",
-                    "branch": "true",
-                    "state_change": "Class 'ending_pos' removed from the element"
-                  },
-                  {
-                    "action": "Skip the removal of 'ending_pos' class",
-                    "branch": "false",
-                    "state_change": "No state change"
-                  }
-                ],
-                "condition": "chessboard.childNodes[i].classList.contains('ending_pos')",
-                "description": "Check if the current child node has the 'ending_pos' class",
-                "type": "if_statement"
-              }
-            ],
-            "condition": "i < chessboard.childNodes.length",
-            "description": "Iterate through all child nodes of the chessboard",
-            "type": "loop"
-          },
-          {
-            "children": [
-              {
-                "description": "Remove the 'highlighted' class from the current move",
-                "type": "operation"
-              }
-            ],
-            "condition": "i < moves.length",
-            "description": "Iterate through all moves in the 'moves' array",
-            "type": "loop"
-          }
-        ]
-      }
+const InfoSection = ({ fileSummaryData, selectedNodeData }) => {
 
+    
     return (
         <Card className="flex flex-col w-[30%] h-full p-4 bg-zinc-900 shadow-md border border-zinc-800 rounded-lg">
     <h2 className="text-3xl font-semibold text-center text-white mb-4">
@@ -79,14 +23,21 @@ const InfoSection = ({ selectedNodeData }) => {
             {/* Render the FileSummary graph dynamically */}
             {selectedNodeData?.name === "even_odd.js" ? (
                 <div className="h-full border border-gray-700 rounded-lg flex items-center justify-center">
-                    <FunctionGraph
-                        data={fileSummaryData}
-                        onNodeClick={() => {}}
-                        style={{
-                            height: "100%", // Ensure the graph fills the container
-                            width: "100%", // Maintain full width within the border
-                        }}
-                    />
+                    {
+                        fileSummaryData ? (
+                            
+                            <FunctionGraph
+                                data={fileSummaryData}
+                                onNodeClick={() => {}}
+                                style={{
+                                    height: "100%", // Ensure the graph fills the container
+                                    width: "100%", // Maintain full width within the border
+                                }}
+                            />
+                        ) : (
+                            <p className="text-gray-300 text-lg">Loading...</p>
+                        )
+                    }
                 </div>
             ) : (
                 <p className="text-center text-gray-300 text-lg">
