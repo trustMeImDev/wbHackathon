@@ -15,6 +15,8 @@ function Directory() {
     const [selectedNode, setSelectedNode] = useState("default");
     const [fileSummaryData, setFileSummaryData] = useState(null);
     const [fileTextSummary, setFileTextSummary] = useState("");
+    const [repo_url, setRepo_url] = useState(null);
+    const [pathUrl, setPathUrl] = useState(null);
     
     useEffect(() => {
         const fetchData = async () => {
@@ -43,7 +45,8 @@ function Directory() {
             const path = pathArray.join('/');
             const owner = repo.split('/')[0];
             const githubUrl = `https://github.com/${repo}`;
-            setSelectedNode(node); // Update the selected node data
+            setRepo_url(githubUrl);
+            setPathUrl(path);
             const authToken = Cookie.get("authToken");
             console.log(authToken)
             try {
@@ -58,11 +61,12 @@ function Directory() {
                 const summaryData = await response.json();
                 console.log(summaryData)
                 setFileSummaryData(summaryData);
-                setFileTextSummary(summaryData.summary);
+                setFileTextSummary(summaryData);
             } catch (error) {
                 console.error('Error fetching file summary:', error);
             }
         }
+        setSelectedNode(node); // Update the selected node data
     };
 
     return (
@@ -75,7 +79,7 @@ function Directory() {
                 </div>
             }
             {/* Pass selectedNode to the InfoSection */}
-            <InfoSection selectedNodeData={selectedNode} fileSummaryData={fileSummaryData} fileTextSummary={fileTextSummary} />
+            <InfoSection selectedNodeData={selectedNode} fileSummaryData={fileSummaryData} fileTextSummary={fileTextSummary} repo_url={repo_url} pathUrl={pathUrl} />
         </div>
     );
 }

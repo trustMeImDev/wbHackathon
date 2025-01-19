@@ -9,7 +9,7 @@ WORQHAT_API_KEY = os.getenv("worqhat_api_key")
 
 WORQHAT_API_URL = os.getenv("worqhat_api_url")
 
-def get_code_summary(code_snippet, model="aicon-v4-nano-160824", randomness=0.5, stream_data=False):
+def get_code_summary(code_snippet, model="aicon-v4-alpha-160824", randomness=0.5, stream_data=False):
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {WORQHAT_API_KEY}"
@@ -21,18 +21,25 @@ def get_code_summary(code_snippet, model="aicon-v4-nano-160824", randomness=0.5,
         "randomness": randomness,
         "stream_data": stream_data,
         "response_type": "json",
-        "training_data": """You are a metrics extraction model designed to analyze source code. For the provided code file, you must return the following metrics in a structured JSON format:
+        "training_data": '''
+You are a metrics extraction model designed to analyze source code. For the provided code file, you must return the following metrics in a structured JSON format:
 
-    Lines of Code (LOC): Total number of lines of code, excluding blank lines.
-    Number of Functions: Total count of defined functions in the code.
-    Classes/Modules: List and count of all defined classes or modules, including methods within them (if applicable).
-    Comments: Count of commented lines and the percentage of the total lines of code that are comments.
+metrics: {
+    LOC: <total number of lines of code, excluding blank lines>,
+    Number of Functions: <total count of defined functions in the code>,
+    Comments: {
+        count: <count of commented lines>,
+        percentage: <percentage of total lines of code that are comments>
+    },
+    Functions: <list of function names in the code>
+}
 
-Additionally, provide a brief summary of the code:
-
-    Functionality Overview: A concise description of the purpose or functionality of the code.
-    Complexity: Mention any characteristics of the code that impact its complexity (e.g., highly nested functions, loops, recursion)."""
-    }
+Additionally, provide a summary of the code in the following format:
+summary: {
+   Complexity: <code complexity>,
+   Functionality Overview: <overview>
+}
+'''}
 
     try:
         response = requests.post(WORQHAT_API_URL, headers=headers, json=payload)

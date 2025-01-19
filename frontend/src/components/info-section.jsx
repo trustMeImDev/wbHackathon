@@ -6,11 +6,31 @@ import { Card } from "./ui/card";
 import Graph from "@/components/graph";
 import Cookies from "js-cookie";
 
-const InfoSection = ({ fileTextSummary, selectedNodeData, fileSummaryData }) => {
+const InfoSection = ({ fileTextSummary, selectedNodeData, fileSummaryData, repo_url, pathUrl }) => {
 
     useEffect(() => {
         console.log(fileSummaryData, fileTextSummary, selectedNodeData);
     }, [fileTextSummary, selectedNodeData, fileSummaryData]);
+
+    const [flowchartData, setFlowchartData] = useState(null);
+    const [selectedFunction, setFunction] = useState(null);
+
+    const handleClick = async (val) => {
+        setFunction(val);
+        const authToken = Cookies.get("authToken");
+        const functionData = await fetch("http://127.0.0.1/code-flow", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${authToken}`,
+            },
+            body: {
+                repo_url: repo_url,
+                file_path: pathUrl,
+                function_name: val,
+            }
+        })
+    }
 
     return (
         <Card className="flex flex-col w-[30%] h-full p-4 bg-zinc-900 shadow-md border border-zinc-800 rounded-lg">
@@ -30,7 +50,7 @@ const InfoSection = ({ fileTextSummary, selectedNodeData, fileSummaryData }) => 
                     {/* Summary Section */}
                     <div className="mt-4 mb-2 overflow-auto scrollbar-hide">
                         <Card className="p-4 bg-zinc-800 border border-zinc-700 rounded-lg mb-4">
-                            
+
                             {fileSummaryData ? (
                                 <>
                                     <h3 className="text-lg font-semibold text-white mb-4">Summary</h3>
@@ -74,32 +94,46 @@ const InfoSection = ({ fileTextSummary, selectedNodeData, fileSummaryData }) => 
                         </Card>
                     </div>
 
+
+                    {/* Functions Section */}
+                    {fileSummaryData && fileSummaryData.metrics && fileSummaryData.metrics.Functions && (
+                        <Card className="p-4 bg-zinc-800 border border-zinc-700 rounded-lg mb-2">
+                            <h3 className="text-lg font-semibold text-white mb-4">Functions</h3>
+                            <select
+                                className="w-full p-2 bg-zinc-700 text-white rounded-lg"
+                                onChange={(e) => handleClick(e.target.value)}
+                            >
+                                {fileSummaryData.metrics.Functions.map((func, index) => (
+                                    <option key={index} value={func}>
+                                        {func}
+                                    </option>
+                                ))}
+                            </select>
+                        </Card>
+                    )}
+
                     {/* Flowchart Section */}
                     <div className="flex flex-col mt-auto h-[50%]">
                         <Card className="flex-grow p-4 bg-zinc-800 border border-zinc-700 rounded-lg">
-                            {fileTextSummary?.flowchart ? (
-                                <div className="h-full border border-gray-700 rounded-lg flex items-center justify-center">
-                                    {
-                                        fileSummaryData ? (
 
-                                            <FunctionGraph
-                                                data={fileTextSummary.flowchart} // Pass fetched flowchart data
-                                                onNodeClick={() => { }}
-                                                style={{
-                                                    height: "100%", // Ensure the graph fills the container
-                                                    width: "100%", // Maintain full width within the border
-                                                }}
-                                            />
-                                        ) : (
-                                            <p className="text-gray-300 text-lg">Loading...</p>
-                                        )
-                                    }
-                                </div>
-                            ) : (
-                                <p className="text-center text-gray-300 text-lg">
-                                    Select a valid file to view the flowchart.
-                                </p>
-                            )}
+                            <div className="h-full border border-gray-700 rounded-lg flex items-center justify-center">
+                                {
+                                    flowchartData ? (
+
+                                        <FunctionGraph
+                                            data={flowchartData} // Pass fetched flowchart data
+                                            onNodeClick={() => { }}
+                                            style={{
+                                                height: "100%", // Ensure the graph fills the container
+                                                width: "100%", // Maintain full width within the border
+                                            }}
+                                        />
+                                    ) : (
+                                        <p className="text-gray-300 text-lg">Loading...</p>
+                                    )
+                                }
+                            </div>
+
                         </Card>
                     </div>
                 </>
@@ -111,15 +145,15 @@ const InfoSection = ({ fileTextSummary, selectedNodeData, fileSummaryData }) => 
 const NodeDetails = ({ selectedNodeData }) => (
     <div>
         <p className="text-lg text-gray-300 mb-2">
-            Selected <span className="font-bold">{selectedNodeData.type}</span> name:{" "}
+            Selected <span className="font-bold">{selectedNodeData.type}</span> name:{selectedNodeData?.data?.label || ""}
             <span className="font-bold text-white"> {selectedNodeData.name}</span>
         </p>
 
-        {selectedNodeData.children?.length > 0 ? (
+        {selectedNodeData?.data?.children?.length > 0 ? (
             <div className="text-lg text-gray-300">
                 <p className="mb-2 font-semibold text-white">Children:</p>
                 <ul className="pl-4 list-disc space-y-1">
-                    {selectedNodeData.children.map((child, index) => (
+                    {selectedNodeData.data.children.map((child, index) => (
                         <li key={index} className="text-gray-400">
                             {child.name} (<span className="italic">{child.type}</span>)
                         </li>
