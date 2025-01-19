@@ -8,7 +8,6 @@ from flask_cors import CORS
 GITHUB_API_URL = "https://api.github.com"
 
 def get_repo_structure(currentUser, repo_url):
-
     if not currentUser:
         return jsonify({"error": "User not found"}), 404
     if not repo_url:
@@ -22,23 +21,51 @@ def get_repo_structure(currentUser, repo_url):
         owner, repo_name = repo_path[:2]
         headers = {"Authorization": f"Bearer {currentUser['access_token']}"}
 
-        # Fetch file structure from GitHub
         def fetch_files(directory=""):
             url = f"{GITHUB_API_URL}/repos/{owner}/{repo_name}/contents/{directory}"
             response = requests.get(url, headers=headers)
             response.raise_for_status()
             contents = response.json()
-            files = []
+
+            directory_structure = []
             for item in contents:
                 if item["type"] == "dir":
-                    files.extend(fetch_files(item["path"]))  # Recursively fetch files from directories
+                    directory_structure.append({
+                        "name": item["name"],
+                        "type": "directory",
+                        "children": fetch_files(item["path"])
+                    })
                 else:
-                    files.append({"path": item["path"], "name": item["name"]})
-            return files
+                    directory_structure.append({
+                        "name": item["name"],
+                        "type": "file"
+                    })
+            return directory_structure
 
-        file_structure = fetch_files()
-        print(file_structure)
-        return jsonify(file_structure)
+        repo_structure = {
+            "name": "root",
+            "type": "directory",
+            "children": fetch_files()
+        }
+
+        return jsonify(repo_structure)
 
     except requests.exceptions.RequestException as e:
         return jsonify({"error": f"GitHub API request failed: {str(e)}"}), 500
+
+
+def get_file_contents(repo_url, file_path, access_token):
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Accept": "application/vnd.github.v3.raw"
+    }
+
+    repo_name = repo_url.split("github.com/")[1]
+    file_url = f"https://api.github.com/repos/{repo_name}/contents/{file_path}"
+
+    response = requests.get(file_url, headers=headers)
+    if response.status_code != 200:
+        return jsonify({"error": "Failed to fetch file contents from GitHub"}), response.status_code
+
+    file_contents = response.text
+    return file_contents

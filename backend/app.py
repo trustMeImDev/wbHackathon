@@ -4,8 +4,10 @@ import requests
 from firebase_admin import firestore, initialize_app, credentials
 from flask import Flask, request, redirect, jsonify, session, make_response
 from flask_cors import CORS
-from github.get_contents import get_repo_structure
+from github.get_contents import get_repo_structure, get_file_contents
 from auth_middleware import token_required
+from worqhat_api.worqhat_summary import get_code_summary
+from worqhat_api.worqhat_dependency_eval import dependancy_eval
 
 app = Flask(__name__)
 
@@ -24,6 +26,8 @@ cred_path = os.path.join(os.path.dirname(__file__), "serviceAccount.json")
 cred = credentials.Certificate(cred_path)
 initialize_app(cred)
 db = firestore.client()
+
+####################################    AUTH STUFF    ####################################
 
 @app.route('/verify-token', methods=['POST'])
 def verify_token():
@@ -116,6 +120,10 @@ def callback():
     else:
         return jsonify({"error": "Failed to obtain access token."}), 400
 
+##########################################################################################
+
+####################################    GITHUB STUFF    ####################################
+
 @app.route('/get-repo-info', methods=['POST'])
 @token_required
 def get_repo_info(currentUser):
@@ -130,6 +138,82 @@ def get_repo_info(currentUser):
     
     user_data = user.to_dict()
     return get_repo_structure(currentUser=user_data, repo_url=repo_url)
+
+############################################################################################
+
+####################################    WORQHAT    ####################################
+@app.route("/code-summary", methods=["POST"])
+@token_required
+def code_summary(currentUser):
+    try:
+        file_path = request.json.get("file_path")
+        repo_url = request.json.get("repo_url")
+
+        user_ref = db.collection("users")
+        user = user_ref.document(str(currentUser["id"])).get()
+
+        if not user.exists:
+            return jsonify({"error": "User not found"}), 404
+
+        user_data = user.to_dict()
+        access_token = user_data.get("access_token")
+
+       
+        code_snippet = get_file_contents(repo_url, file_path, access_token)
+ 
+        summary = get_code_summary(code_snippet)
+        return jsonify(summary)
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/code-flow", methods=["POST"])
+@token_required
+def code_flow(currentUser):
+    try:
+        file_path = request.json.get("file_path")
+        repo_url = request.json.get("repo_url")
+
+        user_ref = db.collection("users")
+        user = user_ref.document(str(currentUser["id"])).get()
+
+        if not user.exists:
+            return jsonify({"error": "User not found"}), 404
+
+        user_data = user.to_dict()
+        access_token = user_data.get("access_token")
+
+        code_snippet = get_file_contents(repo_url, file_path, access_token)
+
+        return jsonify({"message": "Code flow analysis not implemented yet."})
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/code-dependancy", methods=["POST"])
+@token_required
+def code_dependancy(currentUser):
+    try:
+        file_path = request.json.get("file_path")
+        repo_url = request.json.get("repo_url")
+
+        user_ref = db.collection("users")
+        user = user_ref.document(str(currentUser["id"])).get()
+
+        if not user.exists:
+            return jsonify({"error": "User not found"}), 404
+
+        user_data = user.to_dict()
+        access_token = user_data.get("access_token")
+
+        code_snippet = get_file_contents(repo_url, file_path, access_token)
+
+        dependency_eval = dependancy_eval(code_snippet)
+        return jsonify(dependency_eval)
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)

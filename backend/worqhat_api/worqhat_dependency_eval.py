@@ -55,34 +55,3 @@ def process_response_data(response_data):
         print(f"Error processing the response data: {error}")
         return None
 
-if __name__ == "__main__":
-
-    sample_code = """import requests
-import os
-
-class ConfigLoader:
-    def __init__(self):
-        self.env_file = os.getenv("ENV_FILE", ".env")
-
-    def load(self):
-        with open(self.env_file) as f:
-            return f.read()
-
-class APIClient:
-    def __init__(self):
-        self.api_key = "123456"  
-
-    def fetch_data(self, endpoint):
-        response = requests.get(f"https://api.example.com/{endpoint}", headers={"Authorization": self.api_key})
-        return response.json()
-
-"""
-
-
-
-    eval = dependancy_eval(sample_code)
-    if eval:
-        print(json.dumps(eval, indent=4))
-    else:
-        print("Failed to fetch analysis.")
-
