@@ -5,8 +5,17 @@ import { MdOutlineNoteAlt } from "react-icons/md";
 import { FaSitemap } from "react-icons/fa";
 import { AiOutlineFileText } from "react-icons/ai";
 import { HiOutlineChartPie } from "react-icons/hi";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
+import { useNavigate } from 'react-router-dom'; 
+
 
 export const LandingPage = () => {
+    const navigate = useNavigate(); 
+
+    const handleGetStartedClick = () => {
+        navigate('/home'); 
+    };
+
     return (
         <>
             <div className="flex flex-col items-center justify-center min-h-screen text-white text-center">
@@ -17,7 +26,15 @@ export const LandingPage = () => {
                 <p className="text-lg text-gray-300 font-mono mb-2">
                     Generate visualizations and file summaries instantly with ease
                 </p>
-                <div className="mt-16 w-full max-w-6xl text-center">
+
+                <InteractiveHoverButton 
+                    className="mt-8" 
+                    onClick={handleGetStartedClick} // Add onClick event
+                >
+                    Get started
+                </InteractiveHoverButton>
+                
+                <div className="mt-12 w-full max-w-6xl text-center">
                     <h2 className="text-md font-mono">THE PROBLEM WE SOLVE</h2>
                     <h3 className="text-3xl font-semibold mb-8">
                         Freshers get overwhelmed by large codebases
