@@ -1,7 +1,7 @@
-import Graph from '@/components/graph';
-import { useState } from 'react';
-import { Info } from '@/components/info-section';
-
+import React, { useState } from "react";
+import Graph from "@/components/graph";
+import InfoSection from "@/components/info-section"; // Correct
+    
 function FileSummary() {
     const [selectedNodeData, setSelectedNodeData] = useState(null);
 
@@ -20,14 +20,14 @@ function FileSummary() {
         ]
     };
 
-    const handleNodeClick = (nodeData) => {
-        setSelectedNodeData(nodeData);
+    const handleNodeClick = (node) => {
+        setSelectedNodeData(node);
     };
 
     return (
         <div className="flex h-full w-full">
             <Graph data={data} onNodeClick={handleNodeClick} />
-            <Info selectedNodeData={selectedNodeData} />
+            <InfoSection selectedNodeData={selectedNodeData} />
         </div>
     );
 }
