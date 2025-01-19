@@ -1,6 +1,8 @@
+import React, { useEffect, useState } from "react";
+// import ReactFlow, { Controls, Background } from "@xyflow/reactflow";
+import "reactflow/dist/style.css";
 import { ReactFlow, Controls, Background } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { useEffect, useState } from 'react';
 
 function Graph({ data, onNodeClick }) {
     const [nodes, setNodes] = useState([]);
@@ -12,7 +14,6 @@ function Graph({ data, onNodeClick }) {
         const currentId = `${parentId ? `${parentId}-` : ""}${data.name}`;
         const position = { x, y: depth * 150 };
 
-        // Creating the node with the appropriate label and type
         nodes.push({
             id: currentId,
             data: { label: `${data.name} (${data.type})`, ...data },
@@ -20,7 +21,6 @@ function Graph({ data, onNodeClick }) {
             type: "default",
         });
 
-        // If the node has children, create edges and sub-nodes for them
         if (data.children && data.children.length > 0) {
             const totalChildren = data.children.length;
             const halfWidth = (totalChildren - 1) * baseSpacing * 0.5;
@@ -59,13 +59,13 @@ function Graph({ data, onNodeClick }) {
     }, [data]);
 
     return (
-        <div className="w-[70%] h-full">
+        <div className="w-full h-full">
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
                 colorMode="dark"
                 onNodeClick={(event, node) => {
-                    onNodeClick && onNodeClick(node.data); // Pass node data to the handler
+                    onNodeClick && onNodeClick(node.data);
                 }}
             >
                 <Background />
