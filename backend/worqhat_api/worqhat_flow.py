@@ -11,7 +11,7 @@ WORQHAT_API_KEY = os.getenv("worqhat_api_key")
 
 WORQHAT_API_URL = os.getenv("worqhat_api_url")
 
-def workflow(code_snippet, model="aicon-v4-nano-160824", randomness=0.5, stream_data=False):
+def workflow(code_snippet, function_name, model="aicon-v4-nano-160824", randomness=0.5, stream_data=False):
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {WORQHAT_API_KEY}"
@@ -24,21 +24,51 @@ def workflow(code_snippet, model="aicon-v4-nano-160824", randomness=0.5, stream_
         "stream_data": stream_data,
         "response_type": "json",
         "training_data": """
-React Flow Viz Agent
-You are an AI code analysis model tasked with generating a structured representation of the given code that can be used in React Flow for visualization. The output should include:
+Flowchart Viz Agent
+You are an AI model tasked with analyzing the flow of a function or code block and returning a flowchart-like structure. Scan the code provided and return the structure for the function """ + function_name + """. Your output should follow the format below:
 
-- **Nodes**: Each function, class, or important block of code should be represented as a node.
-- **Edges**: Show dependencies between functions, variables, or modules. Indicate which functions call others or share data.
-- Provide this output in a JSON format, with the following structure:
-  - **nodes**: A list of nodes, each represented by:
-      - `id`: A unique identifier for the node.
-      - `label`: The name of the function, class, or code block.
-      - `type`: The type of the node (either `function` or `directory`).
-      - `position`: An object with `x` and `y` values representing the node's position for layout.
-  - **edges**: A list of edges representing dependencies, each containing:
-      - `source`: The `id` of the source node.
-      - `target`: The `id` of the target node.
-      - `relationship`: A description of the relationship (e.g., "calls", "depends_on", "shares_data").
+{
+  "function_name": "<name of the function or method>",
+  "steps": [
+    {
+      "type": "loop",
+      "description": "loop description",
+      "condition": "loop condition",
+      "children":[
+        ...further children inside loop
+      ]
+    },
+    {
+      "type": "if_statement",
+      "description": "An if condition is checked",
+      "condition": "if condition",
+      "branches": [
+        {
+          "branch": "true",
+          "action": "Description of what happens if condition is true",
+          "state_change": "Changes to data"
+        },
+        {
+          "branch": "false",
+          "action": "Description of what happens if condition is false",
+          "state_change": "Changes to data"
+        }
+      ]
+    },
+    {
+      "type": "operation",
+      "description": "Some operation is performed",
+    }
+  ]
+}
+
+Rules:
+The steps should be ordered sequentially based on the flow of execution.
+Each step should only be divisible into three types: loop, if_statement, and operation
+For loops, include the loop condition and a description of the loop. Also include children steps inside the loop.
+For if statements, include both true and false branches with corresponding actions and state changes.
+For operations, describe the operation being performed very briefly.
+Do not include any dependency or hierarchy analysis—just the flow and state transitions in the code.
 """
 }
 
