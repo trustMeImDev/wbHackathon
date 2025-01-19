@@ -1,14 +1,17 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { useState } from "react";
 import FunctionGraph from "./function-graph";
 import { Card } from "./ui/card";
-import Graph from "@/components/graph"; 
+import Graph from "@/components/graph";
 import Cookies from "js-cookie";
 
-const InfoSection = ({ fileSummaryData, selectedNodeData }) => {
+const InfoSection = ({ fileTextSummary, selectedNodeData, fileSummaryData }) => {
 
-    
+    useEffect(() => {
+        console.log(fileSummaryData, fileTextSummary, selectedNodeData);
+    }, [fileTextSummary, selectedNodeData, fileSummaryData]);
+
     return (
         <Card className="flex flex-col w-[30%] h-full p-4 bg-zinc-900 shadow-md border border-zinc-800 rounded-lg">
             <h2 className="text-3xl font-semibold text-center text-white mb-4">
@@ -21,19 +24,21 @@ const InfoSection = ({ fileSummaryData, selectedNodeData }) => {
                 <p className="text-lg text-gray-300 text-center">No node selected.</p>
             )}
 
+
             {selectedNodeData?.type === "file" && (
                 <>
                     {/* Summary Section */}
                     <div className="mt-4 mb-2 overflow-auto scrollbar-hide">
                         <Card className="p-4 bg-zinc-800 border border-zinc-700 rounded-lg mb-4">
-                            {fileTextSummary ? (
+                            
+                            {fileSummaryData ? (
                                 <>
                                     <h3 className="text-lg font-semibold text-white mb-4">Summary</h3>
                                     <p className="text-gray-300 text-sm">
-                                        {fileTextSummary.summary["Functionality Overview"]}
+                                        <strong>Functionality Overview:</strong> {fileSummaryData.summary?.["Functionality Overview"] || "N/A"}
                                     </p>
                                     <p className="text-gray-300 text-sm mt-2">
-                                        {fileTextSummary.summary["Complexity"]}
+                                        <strong>Complexity:</strong> {fileSummaryData.summary?.Complexity || "N/A"}
                                     </p>
                                 </>
                             ) : (
@@ -45,16 +50,16 @@ const InfoSection = ({ fileSummaryData, selectedNodeData }) => {
 
                         {/* Metrics Section */}
                         <Card className="p-4 bg-zinc-800 border border-zinc-700 rounded-lg mb-2">
-                            {fileTextSummary ? (
+                            {fileSummaryData && fileSummaryData.metrics ? (
                                 <>
                                     <h3 className="text-lg font-semibold text-white mb-4">Metrics</h3>
                                     <ul className="space-y-3 text-gray-300 text-sm">
-                                        {Object.entries(fileTextSummary.metrics).map(([key, value], index) => (
+                                        {Object.entries(fileSummaryData.metrics).map(([key, value], index) => (
                                             <li key={index} className="flex justify-between items-center">
                                                 <span className="font-medium text-white">{key}:</span>
                                                 <span className="text-gray-400">
                                                     {typeof value === "object"
-                                                        ? `${value.count} (${value.percentage || "N/A"}%)`
+                                                        ? `Count: ${value.count} (${value.percentage || "N/A"}%)`
                                                         : value}
                                                 </span>
                                             </li>
@@ -75,21 +80,21 @@ const InfoSection = ({ fileSummaryData, selectedNodeData }) => {
                             {fileTextSummary?.flowchart ? (
                                 <div className="h-full border border-gray-700 rounded-lg flex items-center justify-center">
                                     {
-                        fileSummaryData ? (
-                            
-                            <FunctionGraph
+                                        fileSummaryData ? (
+
+                                            <FunctionGraph
                                                 data={fileTextSummary.flowchart} // Pass fetched flowchart data
-                                                onNodeClick={() => {}}
+                                                onNodeClick={() => { }}
                                                 style={{
                                                     height: "100%", // Ensure the graph fills the container
                                                     width: "100%", // Maintain full width within the border
                                                 }}
                                             />
                                         ) : (
-                            <p className="text-gray-300 text-lg">Loading...</p>
-                        )
-                    }
-                </div>
+                                            <p className="text-gray-300 text-lg">Loading...</p>
+                                        )
+                                    }
+                                </div>
                             ) : (
                                 <p className="text-center text-gray-300 text-lg">
                                     Select a valid file to view the flowchart.

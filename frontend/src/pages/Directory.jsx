@@ -14,6 +14,7 @@ function Directory() {
     const [data, setData] = useState(null);
     const [selectedNode, setSelectedNode] = useState("default");
     const [fileSummaryData, setFileSummaryData] = useState(null);
+    const [fileTextSummary, setFileTextSummary] = useState("");
     
     useEffect(() => {
         const fetchData = async () => {
@@ -40,8 +41,27 @@ function Directory() {
             console.log(node)
             const pathArray = node.id.split('-').slice(1);
             const path = pathArray.join('/');
+            const owner = repo.split('/')[0];
             const githubUrl = `https://github.com/${repo}`;
             setSelectedNode(node); // Update the selected node data
+            const authToken = Cookie.get("authToken");
+            console.log(authToken)
+            try {
+                const response = await fetch('http://127.0.0.1:5000/code-summary', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        "Authorization": `Bearer ${authToken}`,
+                    },
+                    body: JSON.stringify({ file_path:path, repo_url:githubUrl }),
+                });
+                const summaryData = await response.json();
+                console.log(summaryData)
+                setFileSummaryData(summaryData);
+                setFileTextSummary(summaryData.summary);
+            } catch (error) {
+                console.error('Error fetching file summary:', error);
+            }
         }
     };
 
@@ -55,7 +75,7 @@ function Directory() {
                 </div>
             }
             {/* Pass selectedNode to the InfoSection */}
-            <InfoSection selectedNodeData={selectedNode} />
+            <InfoSection selectedNodeData={selectedNode} fileSummaryData={fileSummaryData} fileTextSummary={fileTextSummary} />
         </div>
     );
 }
