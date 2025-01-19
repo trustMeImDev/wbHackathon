@@ -18,7 +18,8 @@ const InfoSection = ({ fileTextSummary, selectedNodeData, fileSummaryData, repo_
     const handleClick = async (val) => {
         setFunction(val);
         const authToken = Cookies.get("authToken");
-        const functionData = await fetch("http://127.0.0.1/code-flow", {
+        console.log(val)
+        const functionData = await fetch("http://127.0.0.1:5000/code-flow", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -29,7 +30,7 @@ const InfoSection = ({ fileTextSummary, selectedNodeData, fileSummaryData, repo_
                 file_path: pathUrl,
                 function_name: val,
             }
-        })
+        });
     }
 
     return (
